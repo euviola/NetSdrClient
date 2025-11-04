@@ -89,3 +89,4 @@ jobs:
           /p:CoverletOutput=TestResults/coverage.xml `
           /p:CoverletOutputFormat=opencover
         shell: pwsh
+
