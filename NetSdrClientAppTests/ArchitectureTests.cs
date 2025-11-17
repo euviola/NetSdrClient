@@ -81,17 +81,17 @@ namespace NetSdrClientAppTests
 
         // НОВЕ ПРАВИЛО 3
         [Test]
-        public void App_Should_Not_Depend_On_Messages()
+        public void Core_Should_Not_Depend_On_Networking()
         {
             var result = Types.InAssembly(typeof(NetSdrClientApp.NetSdrClient).Assembly)
                 .That()
-                .ResideInNamespace("NetSdrClientApp")
+                .ResideInNamespace("NetSdrClientApp.Core")
                 .ShouldNot()
-                .HaveDependencyOn("NetSdrClientApp.Messages")
+                .HaveDependencyOn("NetSdrClientApp.Networking")
                 .GetResult();
 
             Assert.That(result.IsSuccessful, Is.True);
         }
-        
+
     }
 }
