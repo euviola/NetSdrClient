@@ -51,6 +51,47 @@ namespace NetSdrClientAppTests
             Assert.That(result.IsSuccessful, Is.True);
         }
 
+         // НОВЕ ПРАВИЛО 1
+        [Test]
+        public void Networking_Should_Not_Depend_On_UI()
+        {
+            var result = Types.InCurrentDomain()
+                .That()
+                .ResideInNamespace("NetSdrClientApp.Networking")
+                .ShouldNot()
+                .HaveDependencyOn("NetSdrClientApp.UI")
+                .GetResult();
+
+            Assert.That(result.IsSuccessful, Is.True);
+        }
+
+        // НОВЕ ПРАВИЛО 2
+        [Test]
+        public void Messages_Should_Not_Depend_On_EchoServer()
+        {
+            var result = Types.InAssembly(typeof(NetSdrClientApp.Messages.NetSdrMessageHelper).Assembly)
+                .That()
+                .ResideInNamespace("NetSdrClientApp.Messages")
+                .ShouldNot()
+                .HaveDependencyOn("EchoServer")
+                .GetResult();
+
+            Assert.That(result.IsSuccessful, Is.True);
+        }
+
+        // НОВЕ ПРАВИЛО 3
+        [Test]
+        public void App_Should_Not_Depend_On_Messages()
+        {
+            var result = Types.InAssembly(typeof(NetSdrClientApp.NetSdrClient).Assembly)
+                .That()
+                .ResideInNamespace("NetSdrClientApp")
+                .ShouldNot()
+                .HaveDependencyOn("NetSdrClientApp.Messages")
+                .GetResult();
+
+            Assert.That(result.IsSuccessful, Is.True);
+        }
         
     }
 }
