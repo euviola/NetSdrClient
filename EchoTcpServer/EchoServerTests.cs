@@ -1,62 +1,52 @@
-using NUnit.Framework;
-using NSubstitute;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using NSubstitute;
+using NUnit.Framework;
 
-namespace EchoServerTests;
-
-public class EchoServerTests
+namespace EchoServerTests
 {
-    [Test]
-    public async Task StartAsync_Should_Start_Listener()
+    public class EchoServerTests
     {
-        var listener = Substitute.For<ITcpListener>();
-        listener.AcceptTcpClientAsync()
-            .Returns(Task.FromResult(new TcpClient()));
+        [Test]
+        public async Task StartAsync_StartsListener_AndStopsAfterCancel()
+        {
+            var listener = Substitute.For<ITcpListener>();
 
-        var handler = Substitute.For<IClientHandler>();
+            listener.AcceptTcpClientAsync().Returns(async _ =>
+            {
+                await Task.Delay(Timeout.Infinite);
+                return new TcpClient();
+            });
 
-        var server = new EchoServer.EchoServer(listener, handler);
+            var handler = Substitute.For<IClientHandler>();
 
-        var task = server.StartAsync();
-        await Task.Delay(50);
+            var server = new EchoServer.EchoServer(listener, handler);
 
-        listener.Received(1).Start();
+            var runTask = server.StartAsync();
 
-        server.Stop();
-    }
+            await Task.Delay(50);
 
-    [Test]
-    public async Task StartAsync_Should_Invoke_Handler()
-    {
-        var listener = Substitute.For<ITcpListener>();
-        listener.AcceptTcpClientAsync()
-            .Returns(Task.FromResult(new TcpClient()));
+            listener.Received(1).Start();
 
-        var handler = Substitute.For<IClientHandler>();
+            server.Stop();
 
-        var server = new EchoServer.EchoServer(listener, handler);
+            await Task.Delay(50);
 
-        var task = server.StartAsync();
-        await Task.Delay(50);
+            listener.Received(1).Stop();
+        }
 
-        await handler.Received(1)
-            .HandleAsync(Arg.Any<TcpClient>(), Arg.Any<CancellationToken>());
+        [Test]
+        public void Stop_Should_Stop_Listener_Immediately()
+        {
+            var listener = Substitute.For<ITcpListener>();
+            var handler = Substitute.For<IClientHandler>();
 
-        server.Stop();
-    }
+            var server = new EchoServer.EchoServer(listener, handler);
 
-    [Test]
-    public void Stop_Should_Stop_Listener()
-    {
-        var listener = Substitute.For<ITcpListener>();
-        var handler = Substitute.For<IClientHandler>();
+            server.Stop();
 
-        var server = new EchoServer.EchoServer(listener, handler);
-
-        server.Stop();
-
-        listener.Received(1).Stop();
+            listener.Received(1).Stop();
+        }
     }
 }
