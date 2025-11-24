@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using EchoServerApp;
 
 namespace EchoServerTests
 {

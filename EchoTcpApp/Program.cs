@@ -5,7 +5,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-/// <summary>
+namespace EchoServerApp
+{
+    /// <summary>
 /// This program was designed for test purposes only
 /// Not for a review
 /// </summary>
@@ -170,4 +172,5 @@ public class UdpTimedSender : IDisposable
         StopSending();
         _udpClient.Dispose();
     }
+}
 }
