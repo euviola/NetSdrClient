@@ -64,7 +64,9 @@ jobs:
           /d:sonar.cpd.cs.minimumLines=5 `
           /d:sonar.exclusions=**/bin/**,**/obj/**,**/sonarcloud.yml `
         shell: pwsh
-      # 2) BUILD & TEST
+
+
+        # 2) BUILD & TEST
       - name: Restore
         run: dotnet restore NetSdrClient.sln
       - name: Build
@@ -73,11 +75,11 @@ jobs:
         run: |
             dotnet test NetSdrClientAppTests/NetSdrClientAppTests.csproj -c Release --no-build `
               /p:CollectCoverage=true `
-              /p:CoverletOutput=TestResults/coverage.xml `
+              /p:CoverletOutput=NetSdrClientAppTests/TestResults/coverage.xml `
               /p:CoverletOutputFormat=opencover
             dotnet test EchoTcpServer/EchoServer.csproj -c Release --no-build `
              /p:CollectCoverage=true `
-             /p:CoverletOutput=TestResults/coverage_EchoServer.xml `
+             /p:CoverletOutput=EchoTcpServer/TestResults/coverage_EchoServer.xml `
              /p:CoverletOutputFormat=opencover
         shell: pwsh
       # 3) END: SonarScanner
