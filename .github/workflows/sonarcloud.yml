@@ -59,7 +59,7 @@ jobs:
           /k:"euviola_NetSdrClient" `
           /o:"euviola"  `
           /d:sonar.token="${{ secrets.SONAR_TOKEN }}" `
-          /d:sonar.cs.opencover.reportsPaths="NetSdrClientAppTests/TestResults/coverage.xml,EchoTcpServer/TestResults/coverage_EchoServer.xml" `
+          /d:sonar.cs.opencover.reportsPaths="NetSdrClientAppTests/TestResults/coverage.xml,EchoServerTests/TestResults/coverage_EchoServer.xml" `
           /d:sonar.cpd.cs.minimumTokens=40 `
           /d:sonar.cpd.cs.minimumLines=5 `
           /d:sonar.exclusions=**/bin/**,**/obj/**,**/sonarcloud.yml `
@@ -76,7 +76,7 @@ jobs:
               /p:CollectCoverage=true `
               /p:CoverletOutput=NetSdrClientAppTests/TestResults/coverage.xml `
               /p:CoverletOutputFormat=opencover
-            dotnet test EchoTcpServer/EchoServer.csproj -c Release --no-build `
+            dotnet test EchoServerTests/EchoServer.csproj -c Release --no-build `
              /p:CollectCoverage=true `
              /p:CoverletOutput=EchoTcpServer/TestResults/coverage_EchoServer.xml `
              /p:CoverletOutputFormat=opencover
