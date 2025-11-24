@@ -1,6 +1,7 @@
 using System.Net.Sockets;
+using EchoServer;
 
-namespace EchoServerTests
+namespace EchoServer
 {
     public interface IClientHandler
     {
