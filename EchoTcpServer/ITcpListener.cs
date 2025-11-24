@@ -1,9 +1,8 @@
 using System.Net.Sockets;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Net;
 using EchoServer;
 
-namespace EchoServerTests
+namespace EchoServer
 {
     public interface ITcpListener
     {
