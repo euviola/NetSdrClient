@@ -1,6 +1,9 @@
 using System.Net.Sockets;
 
-public interface IClientHandler
+namespace EchoServerTests
 {
-    Task HandleAsync(TcpClient client, CancellationToken token);
+    public interface IClientHandler
+    {
+        Task HandleAsync(TcpClient client, CancellationToken token);
+    }
 }

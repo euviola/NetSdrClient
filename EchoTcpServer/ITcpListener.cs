@@ -1,9 +1,12 @@
 using System.Net.Sockets;
 using System.Net;
 
-public interface ITcpListener
+namespace EchoServer
 {
-    void Start();
-    void Stop();
-    Task<TcpClient> AcceptTcpClientAsync();
+    public interface ITcpListener
+    {
+        void Start();
+        void Stop();
+        Task<TcpClient> AcceptTcpClientAsync();
+    }
 }

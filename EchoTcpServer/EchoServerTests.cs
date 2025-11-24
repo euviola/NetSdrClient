@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
+using EchoServer;
 
 namespace EchoServerTests
 {
