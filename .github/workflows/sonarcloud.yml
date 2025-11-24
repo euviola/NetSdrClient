@@ -65,7 +65,6 @@ jobs:
           /d:sonar.exclusions=**/bin/**,**/obj/**,**/sonarcloud.yml `
         shell: pwsh
 
-
         # 2) BUILD & TEST
       - name: Restore
         run: dotnet restore NetSdrClient.sln
