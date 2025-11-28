@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using EchoServerApp;
@@ -9,55 +10,62 @@ namespace EchoServerTests
     public class EchoServerTests
     {
         [Test]
-        public async Task EchoServer_StartAndStop_Works()
+        public async Task StartAsync_ShouldStartServerWithoutException()
         {
-            // Arrange
-            var server = new EchoServer(9000);
-            _ = server.StartAsync(); // запуск без await
+            var server = new EchoServer(9100);
 
-            // Act — підключаємо клієнта
-            await Task.Delay(100); // треба дочекатись Start()
-            using var client = new TcpClient();
-            await client.ConnectAsync("127.0.0.1", 9000);
-
-            // Assert — з'єднання є
-            Assert.IsTrue(client.Connected);
-
-            // Stop server
+            Assert.DoesNotThrowAsync(async () => await server.StartAsync());
             server.Stop();
-            await Task.Delay(50); // дати коректно зупинитись
         }
 
         [Test]
-        public async Task EchoServer_EchoesData()
+        public async Task Server_ShouldAcceptMultipleClients()
         {
-            // Arrange
-            var server = new EchoServer(9001);
+            var server = new EchoServer(9101);
             _ = server.StartAsync();
 
             await Task.Delay(100);
-            using var client = new TcpClient();
-            await client.ConnectAsync("127.0.0.1", 9001);
 
-            var stream = client.GetStream();
-
-            byte[] sent = { 1, 2, 3, 4 };
-            await stream.WriteAsync(sent, 0, sent.Length);
-
-            byte[] buffer = new byte[4];
-            int read = await stream.ReadAsync(buffer, 0, buffer.Length);
-
-            // Assert
-            Assert.AreEqual(sent.Length, read);
-            Assert.AreEqual(sent, buffer);
+            for (int i = 0; i < 3; i++)
+            {
+                using var client = new TcpClient();
+                await client.ConnectAsync("127.0.0.1", 9101);
+                Assert.IsTrue(client.Connected);
+            }
 
             server.Stop();
         }
 
         [Test]
-        public async Task EchoServer_Stop_StopsServer()
+        public async Task Server_ShouldEchoBackDifferentDataSizes()
         {
-            var server = new EchoServer(9002);
+            var server = new EchoServer(9102);
+            _ = server.StartAsync();
+            await Task.Delay(100);
+
+            using var client = new TcpClient();
+            await client.ConnectAsync("127.0.0.1", 9102);
+
+            var stream = client.GetStream();
+
+            byte[] sent = new byte[256];
+            new Random().NextBytes(sent);
+
+            await stream.WriteAsync(sent, 0, sent.Length);
+
+            byte[] received = new byte[256];
+            int read = await stream.ReadAsync(received, 0, received.Length);
+
+            Assert.AreEqual(256, read);
+            CollectionAssert.AreEqual(sent, received);
+
+            server.Stop();
+        }
+
+        [Test]
+        public async Task Stop_ShouldRefuseNewConnections()
+        {
+            var server = new EchoServer(9103);
             _ = server.StartAsync();
 
             await Task.Delay(100);
@@ -65,12 +73,24 @@ namespace EchoServerTests
 
             await Task.Delay(50);
 
-            // Trying connect
             Assert.ThrowsAsync<SocketException>(async () =>
             {
-                var c = new TcpClient();
-                await c.ConnectAsync("127.0.0.1", 9002);
+                using var client = new TcpClient();
+                await client.ConnectAsync("127.0.0.1", 9103);
             });
+        }
+
+        [Test]
+        public async Task EchoServer_StartTwice_ShouldNotThrowAndNotCrash()
+        {
+            var server = new EchoServer(9104);
+
+            await server.StartAsync();
+
+            // Якщо сервер написаний правильно – другий StartAsync просто ігнорується або працює idempotently
+            Assert.DoesNotThrowAsync(async () => await server.StartAsync());
+
+            server.Stop();
         }
     }
 
@@ -78,23 +98,32 @@ namespace EchoServerTests
     public class UdpTimedSenderTests
     {
         [Test]
-        public void UdpTimedSender_ThrowsIfStartedTwice()
+        public void StartSending_ShouldThrowIfCalledTwice()
         {
-            using var sender = new UdpTimedSender("127.0.0.1", 12345);
+            using var sender = new UdpTimedSender("127.0.0.1", 9999);
+
             sender.StartSending(100);
 
             Assert.Throws<InvalidOperationException>(() => sender.StartSending(100));
         }
 
         [Test]
-        public void UdpTimedSender_Dispose_NoException()
+        public void StartSending_WithInvalidInterval_ShouldThrow()
         {
-            using var sender = new UdpTimedSender("127.0.0.1", 12345);
+            using var sender = new UdpTimedSender("127.0.0.1", 9999);
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => sender.StartSending(0));
+            Assert.Throws<ArgumentOutOfRangeException>(() => sender.StartSending(-10));
+        }
+
+        [Test]
+        public void Dispose_ShouldStopSendingWithoutExceptions()
+        {
+            using var sender = new UdpTimedSender("127.0.0.1", 9999);
+
             sender.StartSending(50);
 
-            // просто не повинен впасти
             Assert.DoesNotThrow(() => sender.Dispose());
         }
     }
-
 }
