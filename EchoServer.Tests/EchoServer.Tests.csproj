@@ -29,9 +29,9 @@
 		<PackageReference Include="NUnit3TestAdapter" Version="5.2.0" />
 	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\EchoTspServer\EchoServer.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\EchoServer\EchoServer.csproj" />
+	</ItemGroup>
 
   <ItemGroup>
     <Using Include="NUnit.Framework" />
