@@ -1,7 +1,6 @@
-﻿
-namespace NetSdrClientApp.Networking
+﻿namespace NetSdrClientApp.Networking
 {
-  public interface IUdpClient
+    public interface IUdpClient
     {
         event EventHandler<byte[]>? MessageReceived;
 
@@ -9,5 +8,5 @@ namespace NetSdrClientApp.Networking
 
         void StopListening();
         void Exit();
-    }  
+    }
 }
