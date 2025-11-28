@@ -12,14 +12,14 @@ namespace NetSdrClientApp.Tests
         [Test]
         public void Constructor_SetsHostAndPort()
         {
-            var client = new TcpClientWrapper(_host, 1234);
+            var client = new TcpClientWrapper(_host, 1234); 
             Assert.That(client, Is.Not.Null);
         }
 
         [Test]
         public void Connected_ReturnsFalse_WhenNotConnected()
         {
-            var client = new TcpClientWrapper(_host, 1234);
+            var client = new TcpClientWrapper(_host, 1234); 
             Assert.That(client.Connected, Is.False);
         }
     }

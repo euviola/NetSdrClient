@@ -95,10 +95,11 @@ public class NetSdrClientTests
             // Act
             await _client.StartIQAsync();
 
-            // Assert
+            // Assert: перевіряємо, що SendMessageAsync не викликався
             _tcpMock.Verify(tcp => tcp.SendMessageAsync(It.IsAny<byte[]>()), Times.Never);
             _tcpMock.VerifyGet(tcp => tcp.Connected, Times.AtLeastOnce);
 
+            // Перевіряємо фактичний вихід у консоль
             var output = sw.ToString();
             Assert.That(output, Does.Contain("No active connection"));
         }
@@ -158,13 +159,14 @@ public class NetSdrClientTests
             {
                 if (readCalled == 0)
                 {
-   
+                    // первая итерация: вернуть "ping"
                     Array.Copy(inputBytes, buffer, inputBytes.Length);
                     readCalled++;
                     return Task.FromResult(inputBytes.Length);
                 }
                 else
                 {
+                    // вторая итерация: конец потока
                     return Task.FromResult(0);
                 }
             });
@@ -177,7 +179,7 @@ public class NetSdrClientTests
         var token = new CancellationTokenSource().Token;
         int bytesRead = 0;
 
-        // Act
+        // Act (имитация куска кода с while)
         while (!token.IsCancellationRequested &&
                (bytesRead = await streamMock.Object.ReadAsync(buffer, 0, buffer.Length, token)) > 0)
         {
